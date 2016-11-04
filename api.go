@@ -1,13 +1,23 @@
 package astar
 
-// Priority Queue API
-
-type PriorityQueueItem struct {
-	value     interface{}
-	aPriority float64
-	index     int
+// A* API
+type Node interface {
+	AdjacentNodes() 	  []Node
+	Cost(other Node) 	  float64
+	EstimatedCost(other Node) float64
 }
 
-func (item PriorityQueueItem) Priority() float64 {
-	return item.aPriority
+// Priority Queue API
+type PriorityQueueAStarItem struct {
+	node               Node
+	open               bool
+	closed             bool
+	cost               float64
+	estimatedTotalCost float64
+	parent             *PriorityQueueAStarItem
+	index              int
+}
+
+func (item PriorityQueueAStarItem) Priority() float64 {
+	return item.estimatedTotalCost
 }

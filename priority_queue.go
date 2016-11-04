@@ -2,7 +2,7 @@ package astar
 
 // Refs: https://golang.org/pkg/container/heap/
 
-type PriorityQueue []*PriorityQueueItem
+type PriorityQueue []*PriorityQueueAStarItem
 
 func (pq PriorityQueue) Len() int {
 	return len(pq)
@@ -20,7 +20,7 @@ func (pq PriorityQueue) Swap(i, j int) {
 
 func (pq *PriorityQueue) Push(x interface{}) {
 	n := len(*pq)
-	item := x.(*PriorityQueueItem)
+	item := x.(*PriorityQueueAStarItem)
 	item.index = n
 	*pq = append(*pq, item)
 }
