@@ -29,7 +29,9 @@ func AStar(start, end Node) (distance float64, path []Node) {
 		for _, adjacent := range current.node.AdjacentNodes() {
 			adjacentNode := nodeToPriorityQueueItem.get(adjacent)
 			cost := current.cost + current.node.Cost(adjacent)
-			if (adjacentNode.closed) { continue }
+			if (adjacentNode.closed) {
+				continue
+			}
 
 			// TODO: remove duplicated code
 			if (!adjacentNode.open) {
@@ -54,20 +56,27 @@ func AStar(start, end Node) (distance float64, path []Node) {
 	return -1, nil
 }
 
-func costAndPathToGoal(from *PriorityQueueAStarItem) (distance float64, path []Node) {
-	p := []Node{}
+func costAndPathToGoal(from *PriorityQueueAStarItem) (float64, []Node) {
+	path := []Node{}
 	curr := from
 	for curr != nil {
-		p = append(p, curr.node)
+		path = append(path, curr.node)
 		curr = curr.parent
 	}
-	return from.cost, p
+	reverse(path)
+	return from.cost, path
+}
+
+func reverse(path []Node) {
+	for left, right := 0, len(path) - 1; left < right; left, right = left + 1, right - 1 {
+		path[left], path[right] = path[right], path[left]
+	}
 }
 
 func (nodeToPqItem NodeToPriorityItemMap) get(node Node) *PriorityQueueAStarItem {
 	n, ok := nodeToPqItem[node]
 	if !ok {
-		n = &PriorityQueueAStarItem{ node: node }
+		n = &PriorityQueueAStarItem{node: node }
 		nodeToPqItem[node] = n
 	}
 	return n
