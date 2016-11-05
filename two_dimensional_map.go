@@ -2,12 +2,26 @@ package astar
 
 import "math"
 
-type MapBoundaries struct {
+type MapShape struct {
 	xSize, ySize int
+	obstacles    *[]CartesianCoordinates
 }
 
-func (boundaries MapBoundaries) hasCoordinates(coords CartesianCoordinates) bool {
-	return coords.x >= 0 && coords.x < boundaries.xSize && coords.y >= 0 && coords.y < boundaries.ySize
+func (aMap MapShape) containsPoint(coords CartesianCoordinates) bool {
+	return !aMap.containsObstacle(coords) && aMap.withinBorders(coords)
+}
+
+func (aMap MapShape) containsObstacle(point CartesianCoordinates) bool {
+	for _, o := range *aMap.obstacles {
+		if o == point {
+			return true
+		}
+	}
+	return false
+}
+
+func (aMap MapShape) withinBorders(point CartesianCoordinates) bool {
+	return point.x >= 0 && point.x < aMap.xSize && point.y >= 0 && point.y < aMap.ySize
 }
 
 type CartesianCoordinates struct {
@@ -27,37 +41,37 @@ func (coords CartesianCoordinates) surroundingCoordinates() []CartesianCoordinat
 }
 
 type Graph struct {
-	boundaries MapBoundaries
+	aMap MapShape
 }
 
 func (graph Graph) PointOf(coordinates CartesianCoordinates) TwoDimensionalPoint {
-	if graph.boundaries.hasCoordinates(coordinates) {
-		return TwoDimensionalPoint{coordinates: coordinates, mapBoundaries: graph.boundaries}
+	if graph.aMap.containsPoint(coordinates) {
+		return TwoDimensionalPoint{coordinates: coordinates, aMap: graph.aMap}
 	}
 	// todo should be an error
 	return TwoDimensionalPoint{}
 }
 
-func MapOfSize(x, y int) Graph {
-	return Graph{boundaries: MapBoundaries{xSize: x, ySize: y}}
+func MapOfSize(x int, y int, obstacles []CartesianCoordinates) Graph {
+	return Graph{aMap: MapShape{xSize: x, ySize: y, obstacles: &obstacles}}
 }
 
-func SquareMapOfSize(x int) Graph {
-	return MapOfSize(x, x)
+func SquareMapOfSize(x int, obstacles []CartesianCoordinates) Graph {
+	return MapOfSize(x, x, obstacles)
 }
 
 type TwoDimensionalPoint struct {
-	coordinates   CartesianCoordinates
-	mapBoundaries MapBoundaries
+	coordinates CartesianCoordinates
+	aMap        MapShape
 }
 
 func (point TwoDimensionalPoint) AdjacentNodes() []Node {
 	surroundingCoordinatesIgnoringMapBoundaries := point.coordinates.surroundingCoordinates()
 	takeMapBoundariesIntoAccount := func(c CartesianCoordinates) bool {
-		return point.mapBoundaries.hasCoordinates(c)
+		return point.aMap.containsPoint(c)
 	}
 	coordinatesOfNeighbours := filter(surroundingCoordinatesIgnoringMapBoundaries, takeMapBoundariesIntoAccount)
-	return coordinatesToNodes(coordinatesOfNeighbours, point.mapBoundaries)
+	return coordinatesToNodes(coordinatesOfNeighbours, point.aMap)
 }
 
 func filter(coordinates []CartesianCoordinates, f func(CartesianCoordinates) bool) []CartesianCoordinates {
@@ -70,10 +84,10 @@ func filter(coordinates []CartesianCoordinates, f func(CartesianCoordinates) boo
 	return filteredCoordinates
 }
 
-func coordinatesToNodes(coordinates []CartesianCoordinates, boundaries MapBoundaries) []Node {
+func coordinatesToNodes(coordinates []CartesianCoordinates, boundaries MapShape) []Node {
 	points := make([]Node, 0)
 	for _, singleCoordinate := range coordinates {
-		points = append(points, TwoDimensionalPoint{coordinates: singleCoordinate, mapBoundaries: boundaries})
+		points = append(points, TwoDimensionalPoint{coordinates: singleCoordinate, aMap: boundaries})
 	}
 	return points
 }
@@ -101,6 +115,7 @@ func manhattanDistance(from, to TwoDimensionalPoint) float64 {
 	return math.Abs((float64(to.coordinates.x - from.coordinates.x)) + math.Abs(float64(to.coordinates.y - from.coordinates.y)))
 }
 
+// todo duplication
 func contains(nodes []Node, node Node) bool {
 	for _, t := range nodes {
 		if t == node {
