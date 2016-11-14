@@ -7,7 +7,7 @@ import (
 	"image/color"
 )
 
-func FindShortestPathInGraph(path string) (float64, []Node) {
+func GraphFromBitmap(path string) (Graph, Node, Node) {
 	var start, end CartesianCoordinates
 	var obstacles []CartesianCoordinates = make([]CartesianCoordinates, 0)
 
@@ -30,19 +30,19 @@ func FindShortestPathInGraph(path string) (float64, []Node) {
 	}
 
 	graph := MapOfSize(bitmapSize.X, bitmapSize.Y, obstacles)
-	return AStar(graph.PointOf(start), graph.PointOf(end))
+	return graph, graph.PointOf(start), graph.PointOf(end)
 }
 
 func isStart(pixel color.Color) bool {
-	return false
+	return pixel == color.RGBA{ R: 255, G: 0, B: 0, A: 255 }
 }
 
 func isEnd(pixel color.Color) bool {
-	return false
+	return pixel == color.RGBA{ R: 0, G: 38, B: 255, A: 255 }
 }
 
 func isObstacle(pixel color.Color) bool {
-	return false
+	return pixel == color.RGBA{ R: 0, G: 0, B: 0, A: 255}
 }
 
 func readBitmap(path string) image.Image {
