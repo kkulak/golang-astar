@@ -4,78 +4,76 @@ import "math"
 
 type MapShape struct {
 	xSize, ySize int
-	obstacles    *[]CartesianCoordinates
+	obstacles    *[]AStarNodeState
 }
 
-func (aMap MapShape) containsPoint(coords CartesianCoordinates) bool {
+func (aMap MapShape) containsPoint(coords AStarNodeState) bool {
 	return !aMap.containsObstacle(coords) && aMap.withinBorders(coords)
 }
 
-func (aMap MapShape) containsObstacle(point CartesianCoordinates) bool {
+func (aMap MapShape) containsObstacle(point AStarNodeState) bool {
 	for _, o := range *aMap.obstacles {
-		if o == point {
+		if o.x == point.x && o.y == point.y {
 			return true
 		}
 	}
 	return false
 }
 
-func (aMap MapShape) withinBorders(point CartesianCoordinates) bool {
+func (aMap MapShape) withinBorders(point AStarNodeState) bool {
 	return point.x >= 0 && point.x < aMap.xSize && point.y >= 0 && point.y < aMap.ySize
 }
 
-type CartesianCoordinates struct {
-	x, y int
+type AStarNodeState struct {
+	x, y   int
+	vx, vy int
 }
 
-func (coords CartesianCoordinates) surroundingCoordinates() []CartesianCoordinates {
-	return []CartesianCoordinates{
-		{coords.x - 1, coords.y - 1},
-		{coords.x - 1, coords.y},
-		{coords.x - 1, coords.y + 1},
-		{coords.x, coords.y - 1 },
-		{coords.x, coords.y + 1},
-		{coords.x + 1, coords.y - 1},
-		{coords.x + 1, coords.y},
-		{coords.x + 1, coords.y + 1}}
+func (state AStarNodeState) availableStates() []AStarNodeState {
+	return []AStarNodeState{
+		{state.x + state.vx, state.y + state.vy, state.vx, state.vy},
+		{state.x + state.vx, state.y + state.vy + 1, state.vx, state.vy + 1},
+		{state.x + state.vx, state.y + state.vy - 1, state.vx, state.vy - 1},
+		{state.x + state.vx + 1, state.y + state.vy, state.vx + 1, state.vy},
+		{state.x + state.vx + 1, state.y + state.vy + 1, state.vx + 1, state.vy + 1},
+		{state.x + state.vx + 1, state.y + state.vy - 1, state.vx + 1, state.vy - 1},
+		{state.x + state.vx - 1, state.y + state.vy, state.vx - 1, state.vy},
+		{state.x + state.vx - 1, state.y + state.vy + 1, state.vx - 1, state.vy + 1},
+		{state.x + state.vx - 1, state.y + state.vy - 1, state.vx - 1, state.vy - 1}}
 }
 
 type Graph struct {
 	aMap MapShape
 }
 
-func (graph Graph) PointOf(coordinates CartesianCoordinates) TwoDimensionalPoint {
+func (graph Graph) PointOf(coordinates AStarNodeState) AStarNode {
 	if graph.aMap.containsPoint(coordinates) {
-		return TwoDimensionalPoint{coordinates: coordinates, aMap: graph.aMap}
+		return AStarNode{state: coordinates, aMap: graph.aMap}
 	}
 	// todo should be an error
-	return TwoDimensionalPoint{}
+	return AStarNode{}
 }
 
-func MapOfSize(x int, y int, obstacles []CartesianCoordinates) Graph {
+func MapOfSize(x int, y int, obstacles []AStarNodeState) Graph {
 	return Graph{aMap: MapShape{xSize: x, ySize: y, obstacles: &obstacles}}
 }
 
-func SquareMapOfSize(x int, obstacles []CartesianCoordinates) Graph {
-	return MapOfSize(x, x, obstacles)
+type AStarNode struct {
+	state AStarNodeState
+	aMap  MapShape
 }
 
-type TwoDimensionalPoint struct {
-	coordinates CartesianCoordinates
-	aMap        MapShape
-}
-
-func (point TwoDimensionalPoint) AdjacentNodes() []Node {
-	surroundingCoordinatesIgnoringMapBoundaries := point.coordinates.surroundingCoordinates()
-	takeMapBoundariesIntoAccount := func(c CartesianCoordinates) bool {
+func (point AStarNode) AdjacentNodes() []Node {
+	availableStatesIgnoringMapBoundaries := point.state.availableStates()
+	takeMapBoundariesIntoAccount := func(c AStarNodeState) bool {
 		return point.aMap.containsPoint(c)
 	}
-	coordinatesOfNeighbours := filter(surroundingCoordinatesIgnoringMapBoundaries, takeMapBoundariesIntoAccount)
+	coordinatesOfNeighbours := filter(availableStatesIgnoringMapBoundaries, takeMapBoundariesIntoAccount)
 	return coordinatesToNodes(coordinatesOfNeighbours, point.aMap)
 }
 
-func filter(coordinates []CartesianCoordinates, f func(CartesianCoordinates) bool) []CartesianCoordinates {
-	filteredCoordinates := make([]CartesianCoordinates, 0)
+func filter(coordinates []AStarNodeState, f func(AStarNodeState) bool) []AStarNodeState {
+	filteredCoordinates := make([]AStarNodeState, 0)
 	for _, point := range coordinates {
 		if f(point) {
 			filteredCoordinates = append(filteredCoordinates, point)
@@ -84,16 +82,16 @@ func filter(coordinates []CartesianCoordinates, f func(CartesianCoordinates) boo
 	return filteredCoordinates
 }
 
-func coordinatesToNodes(coordinates []CartesianCoordinates, boundaries MapShape) []Node {
+func coordinatesToNodes(coordinates []AStarNodeState, boundaries MapShape) []Node {
 	points := make([]Node, 0)
-	for _, singleCoordinate := range coordinates {
-		points = append(points, TwoDimensionalPoint{coordinates: singleCoordinate, aMap: boundaries})
+	for _, aStarNodeState := range coordinates {
+		points = append(points, AStarNode{state: aStarNodeState, aMap: boundaries})
 	}
 	return points
 }
 
-func (source TwoDimensionalPoint) Cost(destination Node) float64 {
-	destinationCasted := destination.(TwoDimensionalPoint)
+func (source AStarNode) Cost(destination Node) float64 {
+	destinationCasted := destination.(AStarNode)
 	if contains(source.AdjacentNodes(), destinationCasted) {
 		return cartesianDistance(source, destinationCasted)
 	}
@@ -102,17 +100,17 @@ func (source TwoDimensionalPoint) Cost(destination Node) float64 {
 	return math.MaxFloat64
 }
 
-func (source TwoDimensionalPoint) EstimatedCost(destination Node) float64 {
-	destinationCasted := destination.(TwoDimensionalPoint)
+func (source AStarNode) EstimatedCost(destination Node) float64 {
+	destinationCasted := destination.(AStarNode)
 	return manhattanDistance(source, destinationCasted)
 }
 
-func cartesianDistance(from, to TwoDimensionalPoint) float64 {
-	return math.Sqrt(math.Pow(float64(to.coordinates.x - from.coordinates.x), 2) + math.Pow(float64(to.coordinates.y - from.coordinates.y), 2))
+func cartesianDistance(from, to AStarNode) float64 {
+	return math.Sqrt(math.Pow(float64(to.state.x - from.state.x), 2) + math.Pow(float64(to.state.y - from.state.y), 2))
 }
 
-func manhattanDistance(from, to TwoDimensionalPoint) float64 {
-	return math.Abs((float64(to.coordinates.x - from.coordinates.x)) + math.Abs(float64(to.coordinates.y - from.coordinates.y)))
+func manhattanDistance(from, to AStarNode) float64 {
+	return math.Abs((float64(to.state.x - from.state.x)) + math.Abs(float64(to.state.y - from.state.y)))
 }
 
 // todo duplication

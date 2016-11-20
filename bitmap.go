@@ -5,32 +5,44 @@ import (
 	"golang.org/x/image/bmp"
 	"image"
 	"image/color"
+	"image/draw"
 )
 
 func GraphFromBitmap(path string) (Graph, Node, Node) {
-	var start, end CartesianCoordinates
-	var obstacles []CartesianCoordinates = make([]CartesianCoordinates, 0)
+	var start, end AStarNodeState
+	var obstacles []AStarNodeState = make([]AStarNodeState, 0)
 
-	bitmap := readBitmap(path)
+	bitmap := readBitmap(path + ".bmp")
 	bitmapSize := bitmap.Bounds().Size()
 
 	for x := 0; x < bitmapSize.X; x++ {
 		for y := 0; y < bitmapSize.Y; y++ {
 			pixel := bitmap.At(x, y)
 			if isStart(pixel) {
-				start = CartesianCoordinates{x: x, y: y}
+				start = AStarNodeState{x: x, y: y, vx: 1, vy: 1}
 			}
 			if isEnd(pixel) {
-				end = CartesianCoordinates{x: x, y: y}
+				end = AStarNodeState{x: x, y: y, vx: 0, vy: 0}
 			}
 			if isObstacle(pixel) {
-				obstacles = append(obstacles, CartesianCoordinates{x: x, y: y})
+				obstacles = append(obstacles, AStarNodeState{x: x, y: y, vx: -1, vy: -1})
 			}
 		}
 	}
 
 	graph := MapOfSize(bitmapSize.X, bitmapSize.Y, obstacles)
 	return graph, graph.PointOf(start), graph.PointOf(end)
+}
+
+func PersistGraphToBitmap(path []Node, baseGraphPath string) {
+	bitmap := readBitmap(baseGraphPath + ".bmp").(draw.Image)
+
+	for _, aNode := range path {
+		astarNode := aNode.(AStarNode)
+		bitmap.Set(astarNode.state.x, astarNode.state.y, color.RGBA{R: 0, G: 0, B: 255, A: 255})
+	}
+
+	writeBitmap(bitmap, baseGraphPath + "_out.bmp")
 }
 
 func isStart(pixel color.Color) bool {
@@ -49,4 +61,9 @@ func readBitmap(path string) image.Image {
 	file, _ := os.Open(path)
 	bitmap, _ := bmp.Decode(file)
 	return bitmap
+}
+
+func writeBitmap(image image.Image, path string) {
+	res, _ := os.Create(path)
+	bmp.Encode(res, image)
 }
