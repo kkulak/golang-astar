@@ -34,15 +34,15 @@ func GraphFromBitmap(path string) (Graph, Node, Node) {
 }
 
 func isStart(pixel color.Color) bool {
-	return pixel == color.RGBA{ R: 255, G: 0, B: 0, A: 255 }
+	return pixel == color.RGBA{ R: 0, G: 255, B: 0, A: 255 }
 }
 
 func isEnd(pixel color.Color) bool {
-	return pixel == color.RGBA{ R: 0, G: 38, B: 255, A: 255 }
+	return pixel == color.RGBA{ R: 255, G: 0, B: 0, A: 255 }
 }
 
 func isObstacle(pixel color.Color) bool {
-	return pixel == color.RGBA{ R: 0, G: 0, B: 0, A: 255}
+	return pixel == color.RGBA{ R: 0, G: 0, B: 0, A: 255 }
 }
 
 func readBitmap(path string) image.Image {
