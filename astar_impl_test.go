@@ -23,15 +23,19 @@ func Test__Works_For_Square_Map_With_Diagonal_Path_Without_Obstacles(t *testing.
 	AssertDistanceEqual(t, distance, 2 * math.Sqrt(2))
 
 	// and
-	pointInBetween := TracePoint(1, 1, 1, 1)
-	expectedDiagonalPath := []AStarNodeState{AsTracePoint(start), pointInBetween, AsTracePoint(end)}
+	expectedDiagonalPath := []AStarNodeState{
+		TracePoint(0, 0, 0, 0),
+		TracePoint(1, 1, 1, 1),
+		TracePoint(2, 2, 1, 1),
+		TracePoint(2, 2, 0, 0)}
+
 	AssertTraceEqual(t, actualPath, expectedDiagonalPath)
 }
 
 func Test__Works_For_Square_Map_With_Obstacles(t *testing.T) {
 	// * O O X *
 	// O * O X *
-	// O X * X *
+	// O X O X O
 	// O O * X *
 	// O O O * O
 
@@ -39,23 +43,25 @@ func Test__Works_For_Square_Map_With_Obstacles(t *testing.T) {
 	_, start, end := GraphFromBitmap("resources/5x5_terrain_with_obstacles")
 
 	// when
-	distance, diagonalPath := AStar(start, end)
+	distance, actualPath := AStar(start, end)
 
 	// then
-	PersistGraphToBitmap(diagonalPath, "resources/5x5_terrain_with_obstacles")
-	AssertDistanceEqual(t, distance, 4 * math.Sqrt(2) + 4)
+	PersistGraphToBitmap(actualPath, "resources/5x5_terrain_with_obstacles")
+
+	// and:
+	AssertDistanceEqual(t, distance, math.Sqrt(2) + math.Sqrt(5) + + 2 * math.Sqrt(2) + 3)
 
 	// and
-	//expectedPath := []Node{
-	//	mapWithObstacles.PointOf(coordinates(0, 0)),
-	//	mapWithObstacles.PointOf(coordinates(1, 1)),
-	//	mapWithObstacles.PointOf(coordinates(2, 2)),
-	//	mapWithObstacles.PointOf(coordinates(2, 3)),
-	//	mapWithObstacles.PointOf(coordinates(3, 4)),
-	//	mapWithObstacles.PointOf(coordinates(4, 3)),
-	//	mapWithObstacles.PointOf(coordinates(4, 2)),
-	//	mapWithObstacles.PointOf(coordinates(4, 1)),
-	//	mapWithObstacles.PointOf(coordinates(4, 0))}
-	//
-	//assertPathEqual(t, actualPath, expectedPath)
+	expectedPath := []AStarNodeState{
+		TracePoint(0, 0, 0, 0),
+		TracePoint(1, 1, 1, 1),
+		TracePoint(2, 3, 1, 2),
+		TracePoint(3, 4, 1, 1),
+		TracePoint(3, 4, 0, 0),
+		TracePoint(4, 3, 1, -1),
+		TracePoint(4, 1, 0, -2),
+		TracePoint(4, 0, 0, -1),
+		TracePoint(4, 0, 0, 0)}
+
+	AssertTraceEqual(t, actualPath, expectedPath)
 }
