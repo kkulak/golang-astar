@@ -65,3 +65,35 @@ func Test__Works_For_Square_Map_With_Obstacles(t *testing.T) {
 
 	AssertTraceEqual(t, actualPath, expectedPath)
 }
+
+func Test__Jumps_Over_Obstacles_When_Velocity_Is_Sufficient(t *testing.T) {
+	// * * O * X * * *
+	// O O O O X O O O
+	// O O X O X O O O
+	// O O O O X O O O
+	// O O O O O O O O
+
+	// given
+	_, start, end := GraphFromBitmap("resources/8x5_terrain_with_obstacles")
+
+	// when
+	distance, actualPath := AStar(start, end)
+
+	// then
+	PersistGraphToBitmap(actualPath, "resources/8x5_terrain_with_obstacles")
+
+	// and:
+	AssertDistanceEqual(t, distance, 7)
+
+	// and
+	expectedPath := []AStarNodeState{
+		TracePoint(0, 0, 0, 0),
+		TracePoint(1, 0, 1, 0),
+		TracePoint(3, 0, 2, 0),
+		TracePoint(5, 0, 2, 0),
+		TracePoint(6, 0, 1, 0),
+		TracePoint(7, 0, 1, 0),
+		TracePoint(7, 0, 0, 0)}
+
+	AssertTraceEqual(t, actualPath, expectedPath)
+}
