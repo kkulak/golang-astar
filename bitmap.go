@@ -19,13 +19,13 @@ func GraphFromBitmap(path string) (Graph, Node, Node) {
 		for y := 0; y < bitmapSize.Y; y++ {
 			pixel := bitmap.At(x, y)
 			if isStart(pixel) {
-				start = AStarNodeState{x: x, y: y, vx: 0, vy: 0}
+				start = AStarNodeState{coordinates: Coordinates{x: x, y: y}, velocity: Velocity{x: 0, y: 0}}
 			}
 			if isEnd(pixel) {
-				end = AStarNodeState{x: x, y: y, vx: 0, vy: 0}
+				end = AStarNodeState{coordinates: Coordinates{x: x, y: y}, velocity: Velocity{x: 0, y: 0}}
 			}
 			if isObstacle(pixel) {
-				obstacles = append(obstacles, AStarNodeState{x: x, y: y, vx: -1, vy: -1})
+				obstacles = append(obstacles, AStarNodeState{coordinates: Coordinates{x: x, y: y}})
 			}
 		}
 	}
@@ -39,22 +39,22 @@ func PersistGraphToBitmap(path []Node, baseGraphPath string) {
 
 	for _, aNode := range path {
 		astarNode := aNode.(AStarNode)
-		bitmap.Set(astarNode.state.x, astarNode.state.y, color.RGBA{R: 0, G: 0, B: 255, A: 255})
+		bitmap.Set(astarNode.state.coordinates.x, astarNode.state.coordinates.y, color.RGBA{R: 0, G: 0, B: 255, A: 255})
 	}
 
 	writeBitmap(bitmap, baseGraphPath + "_out.bmp")
 }
 
 func isStart(pixel color.Color) bool {
-	return pixel == color.RGBA{R: 0, G: 255, B: 0, A: 255 }
+	return pixel == color.RGBA{ R: 0, G: 255, B: 0, A: 255 }
 }
 
 func isEnd(pixel color.Color) bool {
-	return pixel == color.RGBA{R: 255, G: 0, B: 0, A: 255 }
+	return pixel == color.RGBA{ R: 255, G: 0, B: 0, A: 255 }
 }
 
 func isObstacle(pixel color.Color) bool {
-	return pixel == color.RGBA{R: 0, G: 0, B: 0, A: 255 }
+	return pixel == color.RGBA{ R: 0, G: 0, B: 0, A: 255 }
 }
 
 func readBitmap(path string) image.Image {

@@ -30,9 +30,9 @@ func normalized(trace []AStarNodeState) []AStarNodeState {
 }
 
 func sameTracePointsConsideringDeceleration(first, second AStarNodeState) bool {
-	sameCoordinates := first.x == second.x && first.y == second.y
+	sameCoordinates := first.coordinates == second.coordinates
 
-	velocityDifference := (first.vx - second.vx) + (first.vy - second.vy)
+	velocityDifference := (first.velocity.x - second.velocity.x) + (first.velocity.y - second.velocity.y)
 	ableToStopInNextStep := velocityDifference >= 1 && velocityDifference <= 2
 
 	return sameCoordinates && ableToStopInNextStep
@@ -57,5 +57,5 @@ func AsTracePoint(node Node) AStarNodeState {
 }
 
 func TracePoint(x, y, vx, vy int) AStarNodeState {
-	return AStarNodeState{x: x, y: y, vx: vx, vy: vy}
+	return AStarNodeState{coordinates: Coordinates{x: x, y: y}, velocity: Velocity{x: vx, y: vy}}
 }
