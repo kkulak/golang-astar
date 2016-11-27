@@ -19,7 +19,7 @@ func GraphFromBitmap(path string) (Graph, Node, Node) {
 		for y := 0; y < bitmapSize.Y; y++ {
 			pixel := bitmap.At(x, y)
 			if isStart(pixel) {
-				start = AStarNodeState{x: x, y: y, vx: 1, vy: 1}
+				start = AStarNodeState{x: x, y: y, vx: 0, vy: 0}
 			}
 			if isEnd(pixel) {
 				end = AStarNodeState{x: x, y: y, vx: 0, vy: 0}
@@ -46,15 +46,15 @@ func PersistGraphToBitmap(path []Node, baseGraphPath string) {
 }
 
 func isStart(pixel color.Color) bool {
-	return pixel == color.RGBA{ R: 0, G: 255, B: 0, A: 255 }
+	return pixel == color.RGBA{R: 0, G: 255, B: 0, A: 255 }
 }
 
 func isEnd(pixel color.Color) bool {
-	return pixel == color.RGBA{ R: 255, G: 0, B: 0, A: 255 }
+	return pixel == color.RGBA{R: 255, G: 0, B: 0, A: 255 }
 }
 
 func isObstacle(pixel color.Color) bool {
-	return pixel == color.RGBA{ R: 0, G: 0, B: 0, A: 255 }
+	return pixel == color.RGBA{R: 0, G: 0, B: 0, A: 255 }
 }
 
 func readBitmap(path string) image.Image {
