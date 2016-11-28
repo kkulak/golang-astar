@@ -1,6 +1,8 @@
 package astar
 
-import "math"
+import (
+	"math"
+)
 
 type MapShape struct {
 	xSize, ySize int
@@ -97,13 +99,21 @@ func (source AStarNode) Cost(destination Node) float64 {
 
 func (source AStarNode) EstimatedCost(destination Node) float64 {
 	destinationCasted := destination.(AStarNode)
-	return manhattanDistance(source, destinationCasted)
+	return oneStepAtATimeEstimatedCost(source, destinationCasted)
 }
 
 func cartesianDistance(from, to AStarNode) float64 {
 	return math.Sqrt(math.Pow(float64(to.state.coordinates.x - from.state.coordinates.x), 2) + math.Pow(float64(to.state.coordinates.y - from.state.coordinates.y), 2))
 }
 
-func manhattanDistance(from, to AStarNode) float64 {
-	return math.Abs((float64(to.state.coordinates.x - from.state.coordinates.x)) + math.Abs(float64(to.state.coordinates.y - from.state.coordinates.y)))
+func oneStepAtATimeEstimatedCost(from, to AStarNode) float64 {
+	distance := (from.state.coordinates.x - to.state.coordinates.x) + (from.state.coordinates.y - to.state.coordinates.y)
+	speed := from.state.velocity.x + from.state.velocity.y
+	distanceInSteps := speed
+	steps := 1
+	for distance > distanceInSteps {
+		distanceInSteps = distanceInSteps + steps * 2 + speed
+		steps = steps + 1
+	}
+	return float64(steps)
 }

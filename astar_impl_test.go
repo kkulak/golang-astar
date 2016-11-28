@@ -59,7 +59,8 @@ func Test__Works_For_Square_Map_With_Obstacles(t *testing.T) {
 		TracePoint(3, 4, 1, 1),
 		TracePoint(3, 4, 0, 0),
 		TracePoint(4, 3, 1, -1),
-		TracePoint(4, 1, 0, -2),
+		TracePoint(4, 2, 0, -1),
+		TracePoint(4, 1, 0, -1),
 		TracePoint(4, 0, 0, -1),
 		TracePoint(4, 0, 0, 0)}
 
@@ -89,7 +90,8 @@ func Test__Jumps_Over_Obstacles_When_Velocity_Is_Sufficient(t *testing.T) {
 	expectedPath := []AStarNodeState{
 		TracePoint(0, 0, 0, 0),
 		TracePoint(1, 0, 1, 0),
-		TracePoint(3, 0, 2, 0),
+		TracePoint(2, 0, 1, 0),
+		TracePoint(3, 0, 1, 0),
 		TracePoint(5, 0, 2, 0),
 		TracePoint(6, 0, 1, 0),
 		TracePoint(7, 0, 1, 0),
