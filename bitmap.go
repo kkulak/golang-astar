@@ -6,11 +6,12 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
+	"github.com/deckarep/golang-set"
 )
 
 func GraphFromBitmap(path string) (Graph, Node, Node) {
 	var start, end AStarNodeState
-	var obstacles []AStarNodeState = make([]AStarNodeState, 0)
+	obstacles  := mapset.NewSet()
 
 	bitmap := readBitmap(path + ".bmp")
 	bitmapSize := bitmap.Bounds().Size()
@@ -25,7 +26,7 @@ func GraphFromBitmap(path string) (Graph, Node, Node) {
 				end = AStarNodeState{coordinates: Coordinates{x: x, y: y}, velocity: Velocity{x: 0, y: 0}}
 			}
 			if isObstacle(pixel) {
-				obstacles = append(obstacles, AStarNodeState{coordinates: Coordinates{x: x, y: y}})
+				obstacles.Add(Coordinates{x: x, y: y})
 			}
 		}
 	}

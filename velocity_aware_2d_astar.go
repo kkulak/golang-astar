@@ -2,11 +2,12 @@ package astar
 
 import (
 	"math"
+	"github.com/deckarep/golang-set"
 )
 
 type MapShape struct {
 	xSize, ySize int
-	obstacles    *[]AStarNodeState
+	obstacles    mapset.Set
 }
 
 func (aMap MapShape) containsPoint(coords Coordinates) bool {
@@ -14,12 +15,7 @@ func (aMap MapShape) containsPoint(coords Coordinates) bool {
 }
 
 func (aMap MapShape) containsObstacle(point Coordinates) bool {
-	for _, o := range *aMap.obstacles {
-		if o.coordinates == point {
-			return true
-		}
-	}
-	return false
+	return aMap.obstacles.Contains(point)
 }
 
 func (aMap MapShape) withinBorders(point Coordinates) bool {
@@ -35,8 +31,8 @@ type Velocity struct {
 }
 
 type AStarNodeState struct {
-	coordinates   Coordinates
-	velocity      Velocity
+	coordinates Coordinates
+	velocity    Velocity
 }
 
 func (state AStarNodeState) availableStates() []AStarNodeState {

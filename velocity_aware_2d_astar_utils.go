@@ -1,5 +1,7 @@
 package astar
 
+import "github.com/deckarep/golang-set"
+
 func filter(coordinates []AStarNodeState, f func(AStarNodeState) bool) []AStarNodeState {
 	filteredCoordinates := make([]AStarNodeState, 0)
 	for _, point := range coordinates {
@@ -28,6 +30,6 @@ func contains(nodes []Node, node Node) bool {
 	return false
 }
 
-func MapOfSize(x int, y int, obstacles []AStarNodeState) Graph {
-	return Graph{aMap: MapShape{xSize: x, ySize: y, obstacles: &obstacles}}
+func MapOfSize(x int, y int, obstacles mapset.Set) Graph {
+	return Graph{aMap: MapShape{xSize: x, ySize: y, obstacles: obstacles}}
 }
