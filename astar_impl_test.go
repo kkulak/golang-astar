@@ -2,7 +2,6 @@ package astar
 
 import (
 	"testing"
-	"math"
 )
 
 func Test__Works_For_Square_Map_With_Diagonal_Path_Without_Obstacles(t *testing.T) {
@@ -20,7 +19,7 @@ func Test__Works_For_Square_Map_With_Diagonal_Path_Without_Obstacles(t *testing.
 	PersistGraphToBitmap(actualPath, "resources/3x3_empty_terrain")
 
 	// and
-	AssertDistanceEqual(t, distance, 2 * math.Sqrt(2))
+	AssertDistanceEqual(t, distance, 3)
 
 	// and
 	expectedDiagonalPath := []AStarNodeState{
@@ -49,16 +48,16 @@ func Test__Works_For_Square_Map_With_Obstacles(t *testing.T) {
 	PersistGraphToBitmap(actualPath, "resources/5x5_terrain_with_obstacles")
 
 	// and:
-	AssertDistanceEqual(t, distance, math.Sqrt(2) + math.Sqrt(5) + + 2 * math.Sqrt(2) + 3)
+	AssertDistanceEqual(t, distance, 9)
 
 	// and
 	expectedPath := []AStarNodeState{
 		TracePoint(0, 0, 0, 0),
-		TracePoint(1, 1, 1, 1),
-		TracePoint(2, 3, 1, 2),
-		TracePoint(3, 4, 1, 1),
-		TracePoint(3, 4, 0, 0),
-		TracePoint(4, 3, 1, -1),
+		TracePoint(0, 1, 0, 1),
+		TracePoint(1, 3, 1, 2),
+		TracePoint(3, 4, 2, 1),
+		TracePoint(4, 4, 1, 0),
+		TracePoint(4, 3, 0, -1),
 		TracePoint(4, 2, 0, -1),
 		TracePoint(4, 1, 0, -1),
 		TracePoint(4, 0, 0, -1),
@@ -84,16 +83,15 @@ func Test__Jumps_Over_Obstacles_When_Velocity_Is_Sufficient(t *testing.T) {
 	PersistGraphToBitmap(actualPath, "resources/8x5_terrain_with_obstacles")
 
 	// and:
-	AssertDistanceEqual(t, distance, 7)
+	AssertDistanceEqual(t, distance, 6)
 
 	// and
 	expectedPath := []AStarNodeState{
 		TracePoint(0, 0, 0, 0),
-		TracePoint(1, 0, 1, 0),
-		TracePoint(2, 0, 1, 0),
-		TracePoint(3, 0, 1, 0),
-		TracePoint(5, 0, 2, 0),
-		TracePoint(6, 0, 1, 0),
+		TracePoint(1, 1, 1, 1),
+		TracePoint(3, 1, 2, 0),
+		TracePoint(5, 1, 2, 0),
+		TracePoint(6, 0, 1, -1),
 		TracePoint(7, 0, 1, 0),
 		TracePoint(7, 0, 0, 0)}
 

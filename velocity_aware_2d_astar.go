@@ -86,7 +86,7 @@ func (point AStarNode) AdjacentNodes() []Node {
 func (source AStarNode) Cost(destination Node) float64 {
 	destinationCasted := destination.(AStarNode)
 	if contains(source.AdjacentNodes(), destinationCasted) {
-		return cartesianDistance(source, destinationCasted)
+		return 1
 	}
 
 	// todo refactor
@@ -96,10 +96,6 @@ func (source AStarNode) Cost(destination Node) float64 {
 func (source AStarNode) EstimatedCost(destination Node) float64 {
 	destinationCasted := destination.(AStarNode)
 	return oneStepAtATimeEstimatedCost(source, destinationCasted)
-}
-
-func cartesianDistance(from, to AStarNode) float64 {
-	return math.Sqrt(math.Pow(float64(to.state.coordinates.x - from.state.coordinates.x), 2) + math.Pow(float64(to.state.coordinates.y - from.state.coordinates.y), 2))
 }
 
 func oneStepAtATimeEstimatedCost(from, to AStarNode) float64 {
