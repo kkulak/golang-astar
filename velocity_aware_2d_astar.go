@@ -38,23 +38,23 @@ type AStarNodeState struct {
 func (state AStarNodeState) availableStates() []AStarNodeState {
 	return []AStarNodeState{
 		{Coordinates{x: state.coordinates.x + state.velocity.x, y: state.coordinates.y + state.velocity.y},
-		 Velocity   {x: state.velocity.x, y: state.velocity.y}},
+			Velocity{x: state.velocity.x, y: state.velocity.y}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x, y: state.coordinates.y + state.velocity.y + 1},
-		 Velocity   {x: state.velocity.x, y: state.velocity.y + 1}},
+			Velocity{x: state.velocity.x, y: state.velocity.y + 1}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x, y: state.coordinates.y + state.velocity.y - 1},
-		 Velocity{x: state.velocity.x, y: state.velocity.y - 1}},
+			Velocity{x: state.velocity.x, y: state.velocity.y - 1}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x + 1, y: state.coordinates.y + state.velocity.y},
-		 Velocity{x: state.velocity.x + 1, y: state.velocity.y}},
+			Velocity{x: state.velocity.x + 1, y: state.velocity.y}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x + 1, y: state.coordinates.y + state.velocity.y + 1},
-		 Velocity{x: state.velocity.x + 1, y: state.velocity.y + 1}},
+			Velocity{x: state.velocity.x + 1, y: state.velocity.y + 1}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x + 1, y: state.coordinates.y + state.velocity.y - 1},
-		 Velocity{x: state.velocity.x + 1, y: state.velocity.y - 1}},
+			Velocity{x: state.velocity.x + 1, y: state.velocity.y - 1}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x - 1, y: state.coordinates.y + state.velocity.y},
-		 Velocity{x: state.velocity.x - 1, y: state.velocity.y}},
+			Velocity{x: state.velocity.x - 1, y: state.velocity.y}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x - 1, y: state.coordinates.y + state.velocity.y + 1},
-		 Velocity{x: state.velocity.x - 1, y: state.velocity.y + 1}},
+			Velocity{x: state.velocity.x - 1, y: state.velocity.y + 1}},
 		{Coordinates{x: state.coordinates.x + state.velocity.x - 1, y: state.coordinates.y + state.velocity.y - 1},
-		 Velocity{x: state.velocity.x - 1, y: state.velocity.y - 1}}}
+			Velocity{x: state.velocity.x - 1, y: state.velocity.y - 1}}}
 }
 
 type Graph struct {
@@ -95,7 +95,8 @@ func (source AStarNode) Cost(destination Node) float64 {
 
 func (source AStarNode) EstimatedCost(destination Node) float64 {
 	destinationCasted := destination.(AStarNode)
-	return oneStepAtATimeEstimatedCost(source, destinationCasted)
+	return SomeStrangeHeuristics(source, destinationCasted)
+	//return oneStepAtATimeEstimatedCost(source, destinationCasted)
 }
 
 func oneStepAtATimeEstimatedCost(from, to AStarNode) float64 {
