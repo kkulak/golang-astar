@@ -2,3 +2,4 @@
 .idea/
 *.iml
 resources/*_out.bmp
+resources/*_out.txt
