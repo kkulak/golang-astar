@@ -8,19 +8,25 @@ func (multiPoint MultiPointAstarNode) Cost(other Node) float64 {
 	thisPoints := multiPoint.points
 	thatPoints := other.(MultiPointAstarNode).points
 
+	totalCost := 0.0
+	for i := range thisPoints {
+		totalCost += thisPoints[i].Cost(thatPoints[i])
+	}
+	return totalCost
+}
+
+func (multiPoint MultiPointAstarNode)EstimatedCost(other Node) float64 {
+	thisPoints := multiPoint.points
+	thatPoints := other.(MultiPointAstarNode).points
+
 	maxCost := 0.0
 	for i := range thisPoints {
-		costForSinglePoint := thisPoints[i].Cost(thatPoints[i])
+		costForSinglePoint := thisPoints[i].EstimatedCost(thatPoints[i])
 		if (costForSinglePoint > maxCost) {
 			maxCost = costForSinglePoint
 		}
 	}
 	return maxCost
-}
-
-func (multiPoint MultiPointAstarNode)EstimatedCost(other Node) float64 {
-	//todo implement
-	return 0
 }
 
 func (multiPoint MultiPointAstarNode) AdjacentNodes() []Node {
