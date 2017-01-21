@@ -1,7 +1,9 @@
 package astar
 
 type MultiPointAstarNode struct {
-	points []AStarNode
+	points      []AStarNode
+	// pozdrawiam pachola legutka
+	destination []Coordinates
 }
 
 func (multiPoint MultiPointAstarNode) Cost(other Node) float64 {
@@ -30,53 +32,78 @@ func (multiPoint MultiPointAstarNode)EstimatedCost(other Node) float64 {
 }
 
 func (multiPoint MultiPointAstarNode) AdjacentNodes() []Node {
-	allPermutations := possibleStatesOfAllPoints(multiPoint)
-	withoutConflictingPositions := filterOutConflictingPositions(allPermutations)
-	return asMultiPointNodes(withoutConflictingPositions)
+	allPermutations := possibleNextMovesOfAllPoints(multiPoint)
+	withoutConflictingPositions := filterOutConflictingPositions(allPermutations, multiPoint.destination)
+	return asMultiPointNodes(withoutConflictingPositions, multiPoint.destination)
 }
 
-func asMultiPointNodes(groupsOfPoints [][]AStarNode) []Node {
+func asMultiPointNodes(groupsOfPoints [][]AStarNode, destination []Coordinates) []Node {
 	multiPointNodes := make([]Node, 0)
 	for _, multiplePoints := range groupsOfPoints {
-		multiPointNodes = append(multiPointNodes, MultiPointAstarNode{multiplePoints})
+		multiPointNodes = append(multiPointNodes, MultiPointAstarNode{multiplePoints, destination})
 	}
 	return multiPointNodes
 }
 
-func filterOutConflictingPositions(allStates [][]AStarNode) [][]AStarNode {
+func filterOutConflictingPositions(allStates [][]AStarNode, destination []Coordinates) [][]AStarNode {
 	withoutDuplicatedPositions := make([][]AStarNode, 0)
 	for _, groupOfPoints := range allStates {
-		if !conflictingPositions(groupOfPoints) {
+		if !conflictingPositions(groupOfPoints, destination) {
 			withoutDuplicatedPositions = append(withoutDuplicatedPositions, groupOfPoints)
 		}
 	}
 	return withoutDuplicatedPositions
 }
 
-func conflictingPositions(multiplePoints []AStarNode) bool {
+func conflictingPositions(multiplePoints []AStarNode, destination[] Coordinates) bool {
 	if (len(multiplePoints) < 2) {
 		return false
 	}
 
-	pointToCheck := multiplePoints[0]
-	otherPoints := multiplePoints[1:]
+	for i, point := range multiplePoints {
+		if reachedHisDestination(point, destination[i]) {
+			continue
+		}
 
-	for _, otherPoint := range otherPoints {
-		if otherPoint.state.coordinates.x == pointToCheck.state.coordinates.x &&
-			otherPoint.state.coordinates.y == pointToCheck.state.coordinates.y {
-			return true
+		for _, otherPoint := range multiplePoints[i + 1:] {
+			if areInTheSamePosition(point, otherPoint) {
+				return true
+			}
 		}
 	}
 
 	return false
 }
 
-func possibleStatesOfAllPoints(multiPoint MultiPointAstarNode) [][]AStarNode {
-	allStatesOfPoints := make([][]AStarNode, 0)
-	for _, singlePoint := range multiPoint.points {
-		allStatesOfPoints = append(allStatesOfPoints, toAstarNodes(singlePoint.AdjacentNodes()))
+func reachedHisDestination(point AStarNode, destination Coordinates) bool {
+	return equal(point.state.coordinates, destination)
+}
+
+func areInTheSamePosition(first, second AStarNode) bool {
+	return equal(first.state.coordinates, second.state.coordinates)
+}
+
+func equal(first, second Coordinates) bool {
+	return first.x == second.x && first.y == second.y;
+}
+
+func possibleNextMovesOfAllPoints(multiPoint MultiPointAstarNode) [][]AStarNode {
+	movesOfAllPoints := make([][]AStarNode, 0)
+	for i, singlePoint := range multiPoint.points {
+		movesOfAllPoints = append(
+			movesOfAllPoints,
+			toAstarNodes(possibleMovesOf(singlePoint, multiPoint.destination[i])),
+		)
 	}
-	return permute(allStatesOfPoints)
+	return permute(movesOfAllPoints)
+}
+
+func possibleMovesOf(singlePoint AStarNode, destination Coordinates) []Node {
+	if reachedHisDestination(singlePoint, destination) {
+		return make([]Node, 0)
+	}
+
+	return singlePoint.AdjacentNodes()
 }
 
 func toAstarNodes(nodes []Node) []AStarNode {
