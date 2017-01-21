@@ -15,5 +15,5 @@ func Test__08(t *testing.T) {
 	PersistGraphWithMultiplePointsToBitmap(actualPath, "resources/test08")
 
 	// and
-	AssertDistanceEqual(t, distance, 3)
+	AssertDistanceEqual(t, distance, 5)
 }

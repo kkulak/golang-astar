@@ -1,9 +1,9 @@
 package astar
 
 type MultiPointAstarNode struct {
-	points      []AStarNode
+	points      [100]AStarNode
 	// pozdrawiam pachola legutka
-	destination []Coordinates
+	destination [100]Coordinates
 }
 
 func (multiPoint MultiPointAstarNode) Cost(other Node) float64 {
@@ -37,15 +37,18 @@ func (multiPoint MultiPointAstarNode) AdjacentNodes() []Node {
 	return asMultiPointNodes(withoutConflictingPositions, multiPoint.destination)
 }
 
-func asMultiPointNodes(groupsOfPoints [][]AStarNode, destination []Coordinates) []Node {
+func asMultiPointNodes(groupsOfPoints [][]AStarNode, destination [100]Coordinates) []Node {
 	multiPointNodes := make([]Node, 0)
 	for _, multiplePoints := range groupsOfPoints {
-		multiPointNodes = append(multiPointNodes, MultiPointAstarNode{multiplePoints, destination})
+		// ekhmmm...
+		var multiplePointsArray[100]AStarNode
+		copy(multiplePoints[:], multiplePointsArray[:100])
+		multiPointNodes = append(multiPointNodes, MultiPointAstarNode{multiplePointsArray, destination})
 	}
 	return multiPointNodes
 }
 
-func filterOutConflictingPositions(allStates [][]AStarNode, destination []Coordinates) [][]AStarNode {
+func filterOutConflictingPositions(allStates [][]AStarNode, destination [100]Coordinates) [][]AStarNode {
 	withoutDuplicatedPositions := make([][]AStarNode, 0)
 	for _, groupOfPoints := range allStates {
 		if !conflictingPositions(groupOfPoints, destination) {
@@ -55,7 +58,7 @@ func filterOutConflictingPositions(allStates [][]AStarNode, destination []Coordi
 	return withoutDuplicatedPositions
 }
 
-func conflictingPositions(multiplePoints []AStarNode, destination[] Coordinates) bool {
+func conflictingPositions(multiplePoints []AStarNode, destination[100] Coordinates) bool {
 	if (len(multiplePoints) < 2) {
 		return false
 	}

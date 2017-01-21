@@ -31,16 +31,16 @@ func ReadMapForMultiplePoints(path string) (Node, Node) {
 
 	graph := MapOfSize(bitmapSize.X, bitmapSize.Y, obstacles)
 
-	destination := make([]Coordinates, 0)
-	for range startingPointPosition {
-		destination = append(destination, endsPosition.coordinates)
+	var destination [100]Coordinates
+	for idx:= range startingPointPosition {
+		destination[idx] = endsPosition.coordinates
 	}
 
-	startingPoints := make([]AStarNode, 0)
-	endingPoints := make([]AStarNode, 0)
-	for _, startingPointState := range startingPointPosition {
-		startingPoints = append(startingPoints, graph.PointOf(startingPointState))
-		endingPoints = append(endingPoints, graph.PointOf(endsPosition))
+	var startingPoints [100]AStarNode
+	var endingPoints [100]AStarNode
+	for idx, startingPointState := range startingPointPosition {
+		startingPoints[idx] = graph.PointOf(startingPointState)
+		endingPoints[idx] = graph.PointOf(endsPosition)
 	}
 
 	return MultiPointAstarNode{startingPoints, destination}, MultiPointAstarNode{endingPoints, destination}
