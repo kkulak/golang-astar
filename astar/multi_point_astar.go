@@ -148,10 +148,17 @@ func possibleNextMovesOfAllPoints(multiPoint MultiPointAstarNode) [][]AStarNode 
 
 func possibleMovesOf(singlePoint AStarNode, destination Coordinates) []Node {
 	if reachedHisDestination(singlePoint, destination) {
-		return make([]Node, 0)
+		return []Node{stayAtDestination(singlePoint, destination)}
 	}
 
 	return singlePoint.AdjacentNodes()
+}
+
+func stayAtDestination(singlePoint AStarNode, destination Coordinates) Node {
+	return AStarNode{
+		state: AStarNodeState{coordinates: destination, velocity: Velocity{0, 0}},
+		aMap: singlePoint.aMap,
+	}
 }
 
 func toAstarNodes(nodes []Node) []AStarNode {
@@ -167,16 +174,6 @@ func permute(listOfLists [][]AStarNode) [][]AStarNode {
 		result := make([][]AStarNode, 0)
 		for _, element := range listOfLists[0] {
 			result = append(result, []AStarNode{element})
-		}
-		return result
-	}
-
-	if (len(listOfLists) == 2) {
-		result := make([][]AStarNode, 0)
-		for _, firstElement := range listOfLists[0] {
-			for _, secondElement := range listOfLists[1] {
-				result = append(result, []AStarNode{firstElement, secondElement})
-			}
 		}
 		return result
 	}
