@@ -120,7 +120,11 @@ func conflictingPositions(multiplePoints []AStarNode, destination[] Coordinates)
 }
 
 func reachedHisDestination(point AStarNode, destination Coordinates) bool {
-	return equal(point.state.coordinates, destination)
+	return equal(point.state.coordinates, destination) && hasNoSpeed(point)
+}
+
+func hasNoSpeed(point AStarNode) bool {
+	return point.state.velocity.x == 0 && point.state.velocity.y == 0
 }
 
 func areInTheSamePosition(first, second AStarNode) bool {

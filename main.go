@@ -12,5 +12,5 @@ func main() {
 
 	// then
 	fmt.Print(distance)
-	astar.PersistGraphWithMultiplePointsToBitmap(actualPath, "resources/test08")
+	astar.PersistGraphWithMultiplePointsToBitmap(actualPath, "resources/test02")
 }
