@@ -6,9 +6,33 @@ type MultiPointAstarNode struct {
 	destination [100]Coordinates
 }
 
+func (multiPoint MultiPointAstarNode) Points() []AStarNode {
+	pointsAsSlice := make([]AStarNode, 0)
+	for _, point := range multiPoint.points {
+		if point == (AStarNode{}) {
+			break
+		}
+
+		pointsAsSlice = append(pointsAsSlice, point)
+	}
+	return pointsAsSlice
+}
+
+func (multiPoint MultiPointAstarNode) Destination() []Coordinates {
+	destinationAsSlice := make([]Coordinates, 0)
+	for _, singleDest := range multiPoint.destination {
+		if singleDest == (Coordinates{}) {
+			break
+		}
+
+		destinationAsSlice = append(destinationAsSlice, singleDest)
+	}
+	return destinationAsSlice
+}
+
 func (multiPoint MultiPointAstarNode) Cost(other Node) float64 {
-	thisPoints := multiPoint.points
-	thatPoints := other.(MultiPointAstarNode).points
+	thisPoints := multiPoint.Points()
+	thatPoints := other.(MultiPointAstarNode).Points()
 
 	totalCost := 0.0
 	for i := range thisPoints {
@@ -18,8 +42,8 @@ func (multiPoint MultiPointAstarNode) Cost(other Node) float64 {
 }
 
 func (multiPoint MultiPointAstarNode)EstimatedCost(other Node) float64 {
-	thisPoints := multiPoint.points
-	thatPoints := other.(MultiPointAstarNode).points
+	thisPoints := multiPoint.Points()
+	thatPoints := other.(MultiPointAstarNode).Points()
 
 	maxCost := 0.0
 	for i := range thisPoints {
@@ -33,22 +57,35 @@ func (multiPoint MultiPointAstarNode)EstimatedCost(other Node) float64 {
 
 func (multiPoint MultiPointAstarNode) AdjacentNodes() []Node {
 	allPermutations := possibleNextMovesOfAllPoints(multiPoint)
-	withoutConflictingPositions := filterOutConflictingPositions(allPermutations, multiPoint.destination)
-	return asMultiPointNodes(withoutConflictingPositions, multiPoint.destination)
+	withoutConflictingPositions := filterOutConflictingPositions(allPermutations, multiPoint.Destination())
+	return asMultiPointNodes(withoutConflictingPositions, multiPoint.Destination())
 }
 
-func asMultiPointNodes(groupsOfPoints [][]AStarNode, destination [100]Coordinates) []Node {
+func asMultiPointNodes(groupsOfPoints [][]AStarNode, destination []Coordinates) []Node {
 	multiPointNodes := make([]Node, 0)
 	for _, multiplePoints := range groupsOfPoints {
-		// ekhmmm...
-		var multiplePointsArray[100]AStarNode
-		copy(multiplePoints[:], multiplePointsArray[:100])
-		multiPointNodes = append(multiPointNodes, MultiPointAstarNode{multiplePointsArray, destination})
+		multiPointNodes = append(multiPointNodes, MultiPointAstarNode{pointsAsArray(multiplePoints), destinationAsArray(destination)})
 	}
 	return multiPointNodes
 }
 
-func filterOutConflictingPositions(allStates [][]AStarNode, destination [100]Coordinates) [][]AStarNode {
+func destinationAsArray(destination []Coordinates) [100]Coordinates {
+	var destAsArray [100]Coordinates
+	for i, coord := range destination {
+		destAsArray[i] = coord
+	}
+	return destAsArray
+}
+
+func pointsAsArray(points []AStarNode) [100]AStarNode {
+	var pointsAsArray [100]AStarNode
+	for i, point := range points {
+		pointsAsArray[i] = point
+	}
+	return pointsAsArray
+}
+
+func filterOutConflictingPositions(allStates [][]AStarNode, destination []Coordinates) [][]AStarNode {
 	withoutDuplicatedPositions := make([][]AStarNode, 0)
 	for _, groupOfPoints := range allStates {
 		if !conflictingPositions(groupOfPoints, destination) {
@@ -58,7 +95,7 @@ func filterOutConflictingPositions(allStates [][]AStarNode, destination [100]Coo
 	return withoutDuplicatedPositions
 }
 
-func conflictingPositions(multiplePoints []AStarNode, destination[100] Coordinates) bool {
+func conflictingPositions(multiplePoints []AStarNode, destination[] Coordinates) bool {
 	if (len(multiplePoints) < 2) {
 		return false
 	}
@@ -92,10 +129,10 @@ func equal(first, second Coordinates) bool {
 
 func possibleNextMovesOfAllPoints(multiPoint MultiPointAstarNode) [][]AStarNode {
 	movesOfAllPoints := make([][]AStarNode, 0)
-	for i, singlePoint := range multiPoint.points {
+	for i, singlePoint := range multiPoint.Points() {
 		movesOfAllPoints = append(
 			movesOfAllPoints,
-			toAstarNodes(possibleMovesOf(singlePoint, multiPoint.destination[i])),
+			toAstarNodes(possibleMovesOf(singlePoint, multiPoint.Destination()[i])),
 		)
 	}
 	return permute(movesOfAllPoints)

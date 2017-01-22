@@ -51,7 +51,7 @@ func PersistGraphWithMultiplePointsToBitmap(path []Node, baseGraphPath string) {
 
 	for _, aNode := range path {
 		multiplePoints := aNode.(MultiPointAstarNode)
-		for _, singlePoint := range multiplePoints.points {
+		for _, singlePoint := range multiplePoints.Points() {
 			bitmap.Set(singlePoint.state.coordinates.x, singlePoint.state.coordinates.y, color.RGBA{R: 0, G: 0, B: 255, A: 255})
 		}
 
