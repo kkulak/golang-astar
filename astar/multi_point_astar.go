@@ -105,6 +105,10 @@ func conflictingPositions(multiplePoints []AStarNode, destination[] Coordinates)
 			continue
 		}
 
+		if (i + 1 == len(multiplePoints)) {
+			break
+		}
+
 		for _, otherPoint := range multiplePoints[i + 1:] {
 			if areInTheSamePosition(point, otherPoint) {
 				return true
@@ -156,7 +160,11 @@ func toAstarNodes(nodes []Node) []AStarNode {
 
 func permute(listOfLists [][]AStarNode) [][]AStarNode {
 	if (len(listOfLists) == 1) {
-		return listOfLists
+		result := make([][]AStarNode, 0)
+		for _, element := range listOfLists[0] {
+			result = append(result, []AStarNode{element})
+		}
+		return result
 	}
 
 	if (len(listOfLists) == 2) {

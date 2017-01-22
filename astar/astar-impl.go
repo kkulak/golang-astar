@@ -1,6 +1,8 @@
 package astar
 
-import "container/heap"
+import (
+	"container/heap"
+)
 
 type NodeToPriorityItemMap map[Node]*PriorityQueueAStarItem
 
